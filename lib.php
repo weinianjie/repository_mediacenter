@@ -8,6 +8,8 @@ if ($CFG->version >= 2012061800) {
 
 class repository_mediacenter extends repository_mediacenter_abs {
 	
+	private $useadmin			= false;
+
 	public function __construct($repositoryid, $context = SYSCONTEXTID, $options = array()) {
 		parent::__construct($repositoryid, $context, $options);
 
@@ -42,6 +44,7 @@ class repository_mediacenter extends repository_mediacenter_abs {
 	// 搜索功能
 	public function search($search_text = '', $page = 0) {
 		global 			$USER, $CFG, $SESSION;
+		$this->search_keyword = $search_text;
 		$ret 			= array();
 		$list			= array();
         $ret['nologin'] 	= true;
@@ -75,7 +78,6 @@ class repository_mediacenter extends repository_mediacenter_abs {
 		$xml_request .= 		'</MsgBody>';		
 		$xml_request .= 	'</RequestMsg>';
 
-		$this->keyword = $search_text;
 		//$sess_mediacenter_connect = 'mediacenter_connect_repository';
 		//$SESSION->{$sess_mediacenter_connect} = 1;
 		try {

@@ -6,7 +6,8 @@ class repository_mediacenter_abs extends repository {
 
     protected $host       		= null;
     protected $url        		= null;
-    //protected $useadmin         = true;
+
+    protected $search_keyword  	= '';
 
 	protected function fetchResult($xml_object) {
 
@@ -61,20 +62,20 @@ class repository_mediacenter_abs extends repository {
 
 	public function print_search() {
 	 
+		$html = '';
 		// label search name
-	/*    $param = array('for' => 'label_search_name');
-		$title = get_string('search_name', 'myrepo_search_name');
-		$html .= html_writer::tag('label', $title, $param);
-		$html .= html_writer::empty_tag('br');
-	 
-	*/
+	    //$param = array('for' => 'label_search_name');
+		//$title = get_string('search_name', 'myrepo_search_name');
+		//$html .= html_writer::tag('label', $title, $param);
+		//$html .= html_writer::empty_tag('br');
+		 
+	
 		// text field search name
 		$attributes['type'] = 'text';
 		$attributes['name'] = 's';
-		$attributes['value'] = '';
-		$attributes['title'] = $title;
+		$attributes['value'] = $this->search_keyword;
+		//$attributes['title'] = $title;
 		$html .= html_writer::empty_tag('input', $attributes);
-		$html .= html_writer::empty_tag('br');
 	 
 		return $html;
 	}

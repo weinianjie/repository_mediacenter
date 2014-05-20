@@ -1,6 +1,7 @@
 <?php
 
 require_once($CFG->dirroot . '/repository/lib.php');
+//require_once($CFG->libdir . "/sheep.php");
 
 class repository_mediacenter_abs extends repository {
 
@@ -31,7 +32,7 @@ class repository_mediacenter_abs extends repository {
 					'date'              =>  $this->toTimestamp($f->UTS),//日期  
 					'author'            =>  (string)($f->Author),//作者
 					//'icon'                =>  '',//找不到预览图的替代图标
-					'source'            =>  (string)($f->VodUrl)//文件源
+					'source'            =>  $this->changeUrl2Moodle((string)($f->VodUrl))//文件源
 				);  
 			}
 		}
@@ -41,6 +42,16 @@ class repository_mediacenter_abs extends repository {
     public static function type_config_form($mform) {
 		parent::type_config_form($mform);
 		repository_mediacenter::type_config_form_real($mform);
+    }
+
+    // 把获取到的地址改成通过moodle方法的代理地址
+    private function changeUrl2Moodle($url) {
+        if($url != null) {
+			$arr = explode('?', $url);
+			$arr2 = explode('repository', $_SERVER['PHP_SELF']);//娘的，处理可能的上下文，虽然PHP里面没有上下文的概念
+            $url = 'http://'.$_SERVER['HTTP_HOST'].$arr2[0].'repository/mediacenter/play.php?'.$arr[1];
+        }
+        return $url;
     }
 
 	private function toTimestamp($strtime){	

@@ -5,6 +5,7 @@ if ($CFG->version >= 2012061800) {
 } else {
 	require_once("lib20.php");
 }
+require_once($CFG->libdir. '/sheep.php');
 
 class repository_mediacenter extends repository_mediacenter_abs {
 	
@@ -28,7 +29,11 @@ class repository_mediacenter extends repository_mediacenter_abs {
 	// 搜索功能
 	public function search($search_text = '', $page = 0) {
 		global 			$USER, $CFG, $SESSION;
+
 		$this->search_keyword = $search_text;
+		$this->search_type 	= optional_param('searchtype', 'vod', PARAM_TEXT);
+		$msgcode = ($this->search_type == 'vod'? 10108 : 10110);// 10108课件、10110教室
+
 		$ret 			= array();
 		$list			= array();
         $ret['nologin'] 	= true;
@@ -44,16 +49,10 @@ class repository_mediacenter extends repository_mediacenter_abs {
 		$xml_request  = 	'<?xml version="1.0" encoding="UTF-8" ?>';
 		$xml_request .= 	'<RequestMsg>';
 		$xml_request .= 		'<MsgHead>';
-		$xml_request .= 			'<MsgCode>10108</MsgCode>';
+		$xml_request .= 			'<MsgCode>'.$msgcode.'</MsgCode>';
 		$xml_request .= 		'</MsgHead>';
 		$xml_request .= 		'<MsgBody>';
-
-		//if(!empty($this->useadmin)){
-		//	$xml_request .= 			'<UserName>admin</UserName>';
-		//}else{
-			$xml_request .= 			'<UserName>'.($USER->username).'</UserName>';
-		//}
-
+		$xml_request .= 			'<UserName>'.($USER->username).'</UserName>';
 		$xml_request .= 			'<Keyword>'.$search_text.'</Keyword>';
 		$xml_request .= 			'<BeginDate></BeginDate>';
 		$xml_request .= 			'<EndDate></EndDate>';

@@ -15,7 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 
+$string['mediacenter:view'] = 'Use mediacenter repository';
 $string['configplugin'] = 'Mediacenter settings';
 $string['pluginname'] = 'Mediacenter';
 $string['host'] = 'Mediacenter addr';
 $string['useadmin'] = 'Administrator Auth';
+$string['vod'] = 'VOD';
+$string['live'] = 'LIVE';

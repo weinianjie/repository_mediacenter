@@ -8,13 +8,13 @@ if ($CFG->version >= 2012061800) {
 
 class repository_mediacenter extends repository_mediacenter_abs {
 	
-	private $useadmin			= false;
+	//private $useadmin			= false;
 
 	public function __construct($repositoryid, $context = SYSCONTEXTID, $options = array()) {
 		parent::__construct($repositoryid, $context, $options);
 
 		$this->host 			= get_config('mediacenter', 'host');//这样获取配置页的配置
-		$this->useadmin 		= get_config('mediacenter', 'useadmin');
+		//$this->useadmin 		= get_config('mediacenter', 'useadmin');
 
 		if ($this->host == null || $this->host == '') {
 			$this->host = 'http://127.0.0.1';
@@ -25,22 +25,6 @@ class repository_mediacenter extends repository_mediacenter_abs {
 		$this->url = $this->host.'/XmlRpcService.action';
 	}
 
-	// 检查是否能连接得上媒体中心
-/*	public function check_login() {
-		return $this->mediacenter_connect == 1;
-	}
-	
-	// 打印连接失败信息
-	public function print_login() {
-		$ret = array();
-		$warn_text = new stdClass();
-		$warn_text->type = 'static';
-		$warn_text->label = '连接媒体中心失败，请检查配置';
-		$ret['login'] = array($warn_text);
-		return $ret;
-	}
-*/
-	
 	// 搜索功能
 	public function search($search_text = '', $page = 0) {
 		global 			$USER, $CFG, $SESSION;
@@ -64,11 +48,11 @@ class repository_mediacenter extends repository_mediacenter_abs {
 		$xml_request .= 		'</MsgHead>';
 		$xml_request .= 		'<MsgBody>';
 
-		if(!empty($this->useadmin)){
-			$xml_request .= 			'<UserName>admin</UserName>';
-		}else{
-			$xml_request .= 			'<UserName>'.$USER->username.'</UserName>';
-		}
+		//if(!empty($this->useadmin)){
+		//	$xml_request .= 			'<UserName>admin</UserName>';
+		//}else{
+			$xml_request .= 			'<UserName>'.($USER->username).'</UserName>';
+		//}
 
 		$xml_request .= 			'<Keyword>'.$search_text.'</Keyword>';
 		$xml_request .= 			'<BeginDate></BeginDate>';
@@ -78,16 +62,21 @@ class repository_mediacenter extends repository_mediacenter_abs {
 		$xml_request .= 		'</MsgBody>';		
 		$xml_request .= 	'</RequestMsg>';
 
-		//$sess_mediacenter_connect = 'mediacenter_connect_repository';
-		//$SESSION->{$sess_mediacenter_connect} = 1;
 		try {
 			$xml_response		= $this->do_post_request($this->url, $xml_request);
 			$xml_object			= simplexml_load_string($xml_response);
-			$list				= $this->fetchResult($xml_object);
-			$ret['list'] 		= $list;
-        	$ret['pages'] 		= (int)$xml_object->MsgBody->Page->LastPage;
+
+			if($xml_object->MsgHead->ReturnCode == 1) {
+				$list				= $this->fetchResult($xml_object);
+				$ret['list'] 		= $list;
+				$ret['pages'] 		= (int)$xml_object->MsgBody->Page->LastPage;
+			}else {
+				echo $xml_object->MsgBody->FaultString;
+				exit;
+			}
 		}catch(Exception $e) {
-			//$SESSION->{$sess_mediacenter_connect} = 0;
+			echo $e->getMessage();
+			exit;
 		}
 
         return $ret;
@@ -101,13 +90,14 @@ class repository_mediacenter extends repository_mediacenter_abs {
 		$strrequired = get_string('required');
 		$mform->addRule('host', $strrequired, 'required', null, 'client');
 
-    	$mform->addElement('checkbox', 'useadmin', get_string('useadmin', 'repository_mediacenter'));
-		$mform->setDefault('useadmin', 0);
+    	//$mform->addElement('checkbox', 'useadmin', get_string('useadmin', 'repository_mediacenter'));
+		//$mform->setDefault('useadmin', 0);
 	}
 
 	// 结合配置页使用，否则配置页的配置无法保存 
 	public static function get_type_option_names() {
-        return array('host', 'useadmin', 'pluginname');
+        //return array('host', 'useadmin', 'pluginname');
+        return array('host', 'pluginname');
 	}
   
 	public function get_listing($path = '', $page = '') {

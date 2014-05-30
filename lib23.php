@@ -49,7 +49,7 @@ class repository_mediacenter_abs extends repository {
         if($url != null) {
 			$arr = explode('?', $url);
 			$arr2 = explode('repository', $_SERVER['PHP_SELF']);//娘的，处理可能的上下文，虽然PHP里面没有上下文的概念
-            $url = 'http://'.$_SERVER['HTTP_HOST'].$arr2[0].'repository/mediacenter/play.php?'.$arr[1];
+            $url = 'http://'.$_SERVER['HTTP_HOST'].$arr2[0].'blocks/mediacenter_lbcontrol/proxy_vod.php?'.$arr[1];
         }
         return $url;
     }
@@ -72,21 +72,22 @@ class repository_mediacenter_abs extends repository {
 	}
 
 	public function print_search() {
-	 
 		$html = '';
-		// label search name
-	    //$param = array('for' => 'label_search_name');
-		//$title = get_string('search_name', 'myrepo_search_name');
-		//$html .= html_writer::tag('label', $title, $param);
-		//$html .= html_writer::empty_tag('br');
-		 
-	
-		// text field search name
-		$attributes['type'] = 'text';
-		$attributes['name'] = 's';
-		$attributes['value'] = $this->search_keyword;
-		//$attributes['title'] = $title;
-		$html .= html_writer::empty_tag('input', $attributes);
+		$html .= '<table><tr>';
+		$html .= '<td><input style="width:160px;" type="text" name="s" value="" /></td>';
+		//$html .= '<td><input style="width:30px;" type="radio" name="searchtype" value="vod" /></td><td style="width:50px;">'.get_string('vod', 'repository_mediacenter').'</td>';
+		//$html .= '<td><input style="width:30px;" type="radio" name="searchtype" value="live" /></td><td style="width:50px;">'.get_string('live', 'repository_mediacenter').'</td>';
+		$html .= '<td><input style="width:30px;" type="radio" name="searchtype" value="vod" /></td><td>VOD</td>';
+		$html .= '<td><input style="width:30px;" type="radio" name="searchtype" value="live" /></td><td>LIVE</td>';
+		$html .= '<td><input style="width:60px; padding:0; margin:-5px 0 0 20px; background:none;" type="submit" value="Submit"/></td>';
+		$html .= '</tr></table>';
+		
+		/*$html .= '<script type="text/javascript">';
+		$html .= 	'function radio_click(obj){';
+		$html .=		'alert(obj.value);';
+		$html .= 	'}';
+		$html .= '</script>';
+*/
 	 
 		return $html;
 	}

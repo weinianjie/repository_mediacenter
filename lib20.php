@@ -54,7 +54,7 @@ class repository_mediacenter_abs extends repository {
 		return $list;
 	}
 
-    public function type_config_form($mform) {
+    public function type_config_form($mform, $classname = 'repository') {
 		parent::type_config_form($mform);
 		repository_mediacenter::type_config_form_real($mform);
     }

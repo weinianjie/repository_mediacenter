@@ -34,7 +34,7 @@ class repository_mediacenter_abs extends repository {
 						'date'              =>  $this->toTimestamp($f->UTS),//日期  
 						'author'            =>  (string)($f->Author),//作者
 						//'icon'                =>  '',//找不到预览图的替代图标
-						'source'            =>  $this->changeUrl2Moodle((string)($f->VodUrl))//文件源
+						'source'            =>  $this->changeUrl2Moodle((string)($f->VodUrl), 'vod')//文件源
 					);  
 				}
 			}
@@ -55,7 +55,7 @@ class repository_mediacenter_abs extends repository {
 						//'date'              =>  (int)($f->UTS),//日期  
 						'author'            =>  'system',//作者
 						//'icon'                =>  '',//找不到预览图的替代图标
-						'source'            =>  $this->changeUrl2Moodle2((string)($f->LiveUrls->LiveUrl[0]))//文件源
+						'source'            =>  $this->changeUrl2Moodle((string)($f->LiveUrls->LiveUrl[0]), 'live')//文件源
 					);  
 				}
 			}
@@ -69,20 +69,12 @@ class repository_mediacenter_abs extends repository {
     }
 
     // 把获取到的地址改成通过moodle方法的代理地址
-    private function changeUrl2Moodle($url) {
-        if($url != null) {
-			$arr = explode('?', $url);
-			$arr2 = explode('repository', $_SERVER['PHP_SELF']);//娘的，处理可能的上下文，虽然PHP里面没有上下文的概念
-            $url = 'http://'.$_SERVER['HTTP_HOST'].$arr2[0].'blocks/mediacenter_lbcontrol/proxy_vod.php?'.$arr[1];
-        }
-        return $url;
-    }
-
-	function changeUrl2Moodle2($url) {
+	private function changeUrl2Moodle($url, $type='vod') {
         if($url != null) {
             $arr = explode('?', $url);
+			$arr2 = explode('repository', $_SERVER['PHP_SELF']);//娘的，处理可能的上下文，虽然PHP里面没有上下文的概念
             $qstr = str_replace('&preview=1', '', $arr[1]);
-            $url = '../'.'blocks/mediacenter_lbcontrol/proxy_live.php?'.$qstr;
+            $url = 'http://'.$_SERVER['HTTP_HOST'].$arr2[0].'blocks/mediacenter_lbcontrol/proxy_'.$type.'.php?'.$qstr;
         }
         return $url;
     }

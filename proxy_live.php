@@ -16,8 +16,7 @@
 	$dbman = $DB->get_manager();
 
 	// 不具有Moodle管理员权限
-	if(!has_capability('moodle/site:config', context_system::instance()) 
-	&& !has_capability('block/lbcontrol:addinstance', context_system::instance())) {
+	if(!has_capability('moodle/site:config', get_context())) {
 
 		$result = mediacenter_request(10405, array('UserName'=>$USER->username, 'RecServerIp'=>$recServerIp, 'Channel'=>$channel));
 		if($result == null) {

@@ -7,12 +7,8 @@
 	// 校验登录
 	require_login();
 
-	// 检测系统'URL'模块是否存在 
-	$dbman = $DB->get_manager();
-
 	// 没有Moodle管理员权限 
-	if(!has_capability('moodle/site:config', context_system::instance()) 
-	&& !has_capability('block/lbcontrol:addinstance', context_system::instance())) {
+	if(!has_capability('moodle/site:config', get_context())) {
 		
 		// 对该课件不具有管理权限(由于目前moodle的课件只能从url模块里点播，所以暂时不加校验)
 		if(1==1) {
@@ -38,6 +34,7 @@
 
 			if (!$DB->record_exists_sql($sql, $sql_ps)){
 
+				$dbman = $DB->get_manager();
 				// 从LINK表里查
 				if(!$dbman->table_exists('link')) {
 					echo 'Have no auths in moodle'.'<br/>';

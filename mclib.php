@@ -39,6 +39,17 @@
 		return $rt;
 	}
 
+	// 兼容的获取context
+	function get_context($params = null) {
+		global $CFG;
+
+		if ($CFG->version >= 2011120500) {// 记录在该版本的version.php里
+			return context_system::instance();//Moodle 2.2 and greater
+		}else{
+			return get_system_context();//Moodle 2.0 and 2.1
+		}
+	}
+
 	// 获取并修正媒体中心地址
 	function get_mc_host() {
 		$mc_host  = get_config('mediacenter', 'host');

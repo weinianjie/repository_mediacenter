@@ -47,7 +47,7 @@ class repository_mediacenter_abs extends repository {
 					//'date'              =>  (int)($f->UTS),//日期  
 					'author'            =>  'system',//作者
 					//'icon'                =>  '',//找不到预览图的替代图标
-					'source'            =>  changeUrl2Moodle2((string)($f->LiveUrls->LiveUrl[0]), 'live')//文件源
+					'source'            =>  changeUrl2Moodle((string)($f->LiveUrls->LiveUrl[0]), 'live')//文件源
 				);  
 			}
 		}

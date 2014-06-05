@@ -5,7 +5,7 @@ if ($CFG->version >= 2012061800) {
 } else {
 	require_once("lib20.php");
 }
-require_once($CFG->libdir. '/sheep.php');
+require_once('mclib.php');
 
 class repository_mediacenter extends repository_mediacenter_abs {
 	
@@ -13,17 +13,6 @@ class repository_mediacenter extends repository_mediacenter_abs {
 
 	public function __construct($repositoryid, $context = SYSCONTEXTID, $options = array()) {
 		parent::__construct($repositoryid, $context, $options);
-
-		$this->host 			= get_config('mediacenter', 'host');//这样获取配置页的配置
-		//$this->useadmin 		= get_config('mediacenter', 'useadmin');
-
-		if ($this->host == null || $this->host == '') {
-			$this->host = 'http://127.0.0.1';
-		} else if (!(strpos($this->host, 'http') === 0)) {//地址修正
-			$this->host = 'http://'.$this->host;	
-		}
-
-		$this->url = $this->host.'/XmlRpcService.action';
 	}
 
 	// 搜索功能
@@ -43,40 +32,24 @@ class repository_mediacenter extends repository_mediacenter_abs {
 		if($ret['page'] < 1){
 			$ret['page'] = 1;
 		}
-		$pageSize			= 12;
 
-		// 用户id没有统一的情况下，先使用username
-		$xml_request  = 	'<?xml version="1.0" encoding="UTF-8" ?>';
-		$xml_request .= 	'<RequestMsg>';
-		$xml_request .= 		'<MsgHead>';
-		$xml_request .= 			'<MsgCode>'.$msgcode.'</MsgCode>';
-		$xml_request .= 		'</MsgHead>';
-		$xml_request .= 		'<MsgBody>';
-		$xml_request .= 			'<UserName>'.($USER->username).'</UserName>';
-		$xml_request .= 			'<Keyword>'.$search_text.'</Keyword>';
-		$xml_request .= 			'<BeginDate></BeginDate>';
-		$xml_request .= 			'<EndDate></EndDate>';
-		$xml_request .= 			'<PageSize>'.$pageSize.'</PageSize>';
-		$xml_request .= 			'<PageNum>'.$ret['page'].'</PageNum>';
-		$xml_request .= 		'</MsgBody>';		
-		$xml_request .= 	'</RequestMsg>';
+		$params = array(
+			'UserName'=>($USER->username),
+			'Keyword'=>$search_text,
+			'BeginDate'=>'',
+			'EndDate'=>'',
+			'PageSize'=>12,
+			'PageNum'=>$ret['page']
+		);
 
-		try {
-			$xml_response		= $this->do_post_request($this->url, $xml_request);
-			$xml_object			= simplexml_load_string($xml_response);
-
-			if($xml_object->MsgHead->ReturnCode == 1) {
-				$list				= $this->fetchResult($xml_object);
-				$ret['list'] 		= $list;
-				$ret['pages'] 		= (int)$xml_object->MsgBody->Page->LastPage;
-			}else {
-				echo $xml_object->MsgBody->FaultString;
-				exit;
-			}
-		}catch(Exception $e) {
-			echo $e->getMessage();
+		$result = mediacenter_request($msgcode, $params);
+		if($result == null) {
 			exit;
 		}
+
+		$list				= $this->fetchResult($result);
+		$ret['list'] 		= $list;
+		$ret['pages'] 		= (int)$result->Page->LastPage;
 
         return $ret;
 	}
@@ -88,9 +61,6 @@ class repository_mediacenter extends repository_mediacenter_abs {
 
 		$strrequired = get_string('required');
 		$mform->addRule('host', $strrequired, 'required', null, 'client');
-
-    	//$mform->addElement('checkbox', 'useadmin', get_string('useadmin', 'repository_mediacenter'));
-		//$mform->setDefault('useadmin', 0);
 	}
 
 	// 结合配置页使用，否则配置页的配置无法保存 
@@ -116,24 +86,4 @@ class repository_mediacenter extends repository_mediacenter_abs {
 		return FILE_EXTERNAL;
 	}
 
-	//send post request
-	private function do_post_request($url, $data, $optional_headers = null) {
-		$params = array('http' => array(
-                  'method' => 'POST',
-                  'content' => $data
-		));
-		if ($optional_headers !== null) {
-			$params['http']['header'] = $optional_headers;
-		}
-		$ctx = stream_context_create($params);
-		$fp = @fopen($url, 'rb', false, $ctx);
-		if (!$fp) {
-			throw new Exception("Problem with $url");
-		}
-		$response = @stream_get_contents($fp);
-		if ($response === false) {
-			throw new Exception("Problem reading data from $url");
-		}
-		return $response;
-	}
 }
